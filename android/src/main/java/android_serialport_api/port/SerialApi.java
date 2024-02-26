@@ -5,7 +5,6 @@
  *  Copyright © 2022 BjsSoftSolution. All rights reserved.
  */
 
-
 package android_serialport_api.port;
 
 import java.io.File;
@@ -62,7 +61,7 @@ class SerialApi {
             return open;
         }
         try {
-            serialPort = new android_serialport_api.SerialPort(new File(port), 9600, 0);
+            serialPort = new android_serialport_api.SerialPort(new File(port), baudRate, 0);
             if (serialPort == null) {
 
                 log(SerialApiManager.port, port, isAscii, new StringBuffer().append("Boot failure：SerialPort == null"));
@@ -95,7 +94,8 @@ class SerialApi {
     public void setReadCode(boolean isAscii) {
         if (readThread != null) {
             readThread.isAscii = isAscii;
-            log(SerialApiManager.port, port, readThread.isAscii, new StringBuffer().append("Modify data format：").append(isAscii ? "ASCII" : "HexString"));
+            log(SerialApiManager.port, port, readThread.isAscii,
+                    new StringBuffer().append("Modify data format：").append(isAscii ? "ASCII" : "HexString"));
         }
     }
 
@@ -133,7 +133,8 @@ class SerialApi {
                         byte[] buffer = new byte[512];
                         /**
                          * When no data is read, the method waits until the data is read
-                         * In IO blocking state, the thread can not interrupt, even if the interrupt, there is data coming, the program will execute to the interrupt flag
+                         * In IO blocking state, the thread can not interrupt, even if the interrupt,
+                         * there is data coming, the program will execute to the interrupt flag
                          */
                         size = inputStream.read(buffer);
                         if (!isRun) {
@@ -170,6 +171,7 @@ class SerialApi {
     }
 
     public void write(boolean isAscii, String cmd) {
+
         log(SerialApiManager.write, port, isAscii, new StringBuffer().append(cmd));
         if (outputStream != null) {
             synchronized (outputStream) {
@@ -178,7 +180,12 @@ class SerialApi {
                     if (isAscii) {
                         bytes = cmd.getBytes();
                     } else {
-                        bytes = TransformUtils.hexStringToBytes(cmd);
+                        int crc = BaseReader.crc(cmd);
+                        String crcStr = Integer.toHexString(crc);
+                        crcStr = crcStr.length() < 2 ? "0" + crcStr : crcStr;
+                        System.out.println("crc" + crc);
+                        System.out.println("crcStr" + crcStr);
+                        bytes = TransformUtils.hexStringToBytes(cmd + crcStr);
                     }
                     outputStream.write(bytes);
                 } catch (Exception e) {
@@ -187,7 +194,8 @@ class SerialApi {
             }
             log(SerialApiManager.write, port, isAscii, new StringBuffer().append("Write a successful：").append(cmd));
         } else {
-            log(SerialApiManager.write, port, isAscii, new StringBuffer().append("Write a failure：outputStream is null"));
+            log(SerialApiManager.write, port, isAscii,
+                    new StringBuffer().append("Write a failure：outputStream is null"));
         }
     }
 

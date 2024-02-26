@@ -5,9 +5,8 @@
  *  Copyright © 2022 BjsSoftSolution. All rights reserved.
  */
 
-
-
 package android_serialport_api.port;
+
 import android.util.Log;
 
 import androidx.annotation.StringDef;
@@ -16,8 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
-
 public class SerialApiManager {
 
     private final String TAG = "ADan_SerialPortManager";
@@ -25,14 +22,12 @@ public class SerialApiManager {
     private HashMap serialPorts;
     private LogInterceptorSerialPort logInterceptor;
 
-
-
     public static final String port = "port";
     public static final String read = "read";
     public static final String write = "write";
     public static final String append = "append";
 
-    @StringDef({port, read, write, append})
+    @StringDef({ port, read, write, append })
     public @interface Type {
     }
 
@@ -68,13 +63,13 @@ public class SerialApiManager {
      * @param isAscii coded format true:ascii false HexString
      * @param reader  Read data monitor
      */
-    public boolean startSerialPort(String port, boolean isAscii, BaseReader reader,int baudRate) {
+    public boolean startSerialPort(String port, boolean isAscii, BaseReader reader, int baudRate) {
         return startSerialPort(port, isAscii, baudRate, 0, reader);
     }
 
     /**
      *
-     * @param port      Serial Number
+     * @param port     Serial Number
      * @param baudRate Baud rate
      * @param flags    sign
      * @param reader   Read data monitor
@@ -84,7 +79,7 @@ public class SerialApiManager {
         if (serialPorts.containsKey(port)) {
             serial = (SerialApi) serialPorts.get(port);
         } else {
-            Log.d("SerialPort",port);
+            Log.d("SerialPort", port);
             serial = new SerialApi(port, isAscii, baudRate, flags);
             serialPorts.put(port, serial);
         }
