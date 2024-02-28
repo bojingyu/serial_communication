@@ -12,10 +12,12 @@ public abstract class BaseReader {
     private LogInterceptorSerialPort logInterceptor;
     public String port;
     public boolean isAscii;
+    public boolean useCRC8;
 
-    void onBaseRead(String port, boolean isAscii, byte[] buffer, int size) {
+    void onBaseRead(String port, boolean isAscii, byte[] buffer, int size, boolean useCRC8) {
         this.port = port;
         this.isAscii = isAscii;
+        this.useCRC8 = useCRC8;
         String read;
         if (isAscii) {
             read = new String(buffer, 0, size);
@@ -23,10 +25,10 @@ public abstract class BaseReader {
             read = TransformUtils.bytes2HexString(buffer, size);
         }
         log(SerialApiManager.read, port, isAscii, new StringBuffer().append(read));
-        onParse(port, isAscii, read);
+        onParse(port, isAscii, read, useCRC8);
     }
 
-    protected abstract void onParse(String port, boolean isAscii, String read);
+    protected abstract void onParse(String port, boolean isAscii, String read, boolean useCRC8);
 
     public void setLogInterceptor(LogInterceptorSerialPort logInterceptor) {
         this.logInterceptor = logInterceptor;

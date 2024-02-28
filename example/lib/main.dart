@@ -280,7 +280,10 @@ class _HomePageState extends State<HomePage> {
                       serialCommunication.openPort(
                           dataFormat: format,
                           serialPort: selectedPort,
-                          baudRate: selectedBaudRate);
+                          baudRate: selectedBaudRate,
+                          dataBits: 8,
+                          parity: 0,
+                          stopBits: 1);
                     }),
                 button(
                     name: "Close",

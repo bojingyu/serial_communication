@@ -36,7 +36,11 @@ class MockSerialCommunicationPlatform
   Future<String?> openPort(
       {required DataFormat dataFormat,
       required String serialPort,
-      required int baudRate}) {
+      required int baudRate,
+      required int dataBits,
+      required int parity,
+      required int stopBits,
+      useCRC8 = false}) {
     throw UnimplementedError();
   }
 

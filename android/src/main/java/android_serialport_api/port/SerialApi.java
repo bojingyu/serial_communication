@@ -22,14 +22,22 @@ class SerialApi {
     private boolean open;
     private boolean isAscii;
     private int baudRate;
+    private int dataBits;
+    private int parity;
+    private int stopBits;
     private int flags;
+    private boolean useCRC8;
     private LogInterceptorSerialPort logInterceptor;
 
-    public SerialApi(String port, boolean isAscii, int baudRate, int flags) {
+    public SerialApi(String port, boolean isAscii, int baudRate, int dataBits, int parity, int stopBits, int flags, boolean useCRC8) {
         this.port = port;
         this.isAscii = isAscii;
         this.baudRate = baudRate;
+        this.dataBits = dataBits;
+        this.parity = parity;
+        this.stopBits = stopBits;
         this.flags = flags;
+        this.useCRC8 = useCRC8;
     }
 
     public void setLogInterceptor(LogInterceptorSerialPort logInterceptor) {
@@ -61,7 +69,7 @@ class SerialApi {
             return open;
         }
         try {
-            serialPort = new android_serialport_api.SerialPort(new File(port), baudRate, 0);
+            serialPort = new android_serialport_api.SerialPort(new File(port), baudRate, dataBits, parity, stopBits, 0);
             if (serialPort == null) {
 
                 log(SerialApiManager.port, port, isAscii, new StringBuffer().append("Boot failure：SerialPort == null"));
@@ -74,7 +82,7 @@ class SerialApi {
                 if (outputStream == null) {
                     throw new Exception("outputStream==null");
                 }
-                readThread = new ReadThread(isAscii, reader);
+                readThread = new ReadThread(isAscii, reader, useCRC8);
                 readThread.start();
                 open = true;
                 log(SerialApiManager.port, port, isAscii, new StringBuffer().append("starting success"));
@@ -109,11 +117,13 @@ class SerialApi {
 
         public boolean isRun;
         public boolean isAscii;
+        public boolean useCRC8;
         private BaseReader reader;
 
-        public ReadThread(boolean isAscii, BaseReader baseReader) {
+        public ReadThread(boolean isAscii, BaseReader baseReader, boolean useCRC8) {
             reader = baseReader;
             this.isAscii = isAscii;
+            this.useCRC8 = useCRC8;
             if (reader != null) {
                 reader.setLogInterceptor(logInterceptor);
             }
@@ -142,7 +152,7 @@ class SerialApi {
                         }
                         if (reader != null) {
                             if (size > 0) {
-                                reader.onBaseRead(port, isAscii, buffer, size);
+                                reader.onBaseRead(port, isAscii, buffer, size, useCRC8);
                             }
                         }
                     }
@@ -180,12 +190,16 @@ class SerialApi {
                     if (isAscii) {
                         bytes = cmd.getBytes();
                     } else {
-                        int crc = BaseReader.crc(cmd);
-                        String crcStr = Integer.toHexString(crc);
-                        crcStr = crcStr.length() < 2 ? "0" + crcStr : crcStr;
-                        System.out.println("crc" + crc);
-                        System.out.println("crcStr" + crcStr);
-                        bytes = TransformUtils.hexStringToBytes(cmd + crcStr);
+                        if(useCRC8==true){
+                            int crc = BaseReader.crc(cmd);
+                            String crcStr = Integer.toHexString(crc);
+                            crcStr = crcStr.length() < 2 ? "0" + crcStr : crcStr;
+                            System.out.println("crc" + crc);
+                            System.out.println("crcStr" + crcStr);
+                            bytes = TransformUtils.hexStringToBytes(cmd + crcStr);
+                        }else{
+                            bytes = TransformUtils.hexStringToBytes(cmd);
+                        }
                     }
                     outputStream.write(bytes);
                 } catch (Exception e) {

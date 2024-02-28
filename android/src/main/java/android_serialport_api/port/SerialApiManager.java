@@ -64,7 +64,7 @@ public class SerialApiManager {
      * @param reader  Read data monitor
      */
     public boolean startSerialPort(String port, boolean isAscii, BaseReader reader, int baudRate) {
-        return startSerialPort(port, isAscii, baudRate, 0, reader);
+        return startSerialPort(port, isAscii, baudRate, 8, 0, 1, 0, reader, false);
     }
 
     /**
@@ -74,13 +74,14 @@ public class SerialApiManager {
      * @param flags    sign
      * @param reader   Read data monitor
      */
-    public boolean startSerialPort(String port, boolean isAscii, int baudRate, int flags, BaseReader reader) {
+    public boolean startSerialPort(String port, boolean isAscii, int baudRate, int dataBits, int parity, int stopBits,
+            int flags, BaseReader reader, boolean useCRC8) {
         SerialApi serial;
         if (serialPorts.containsKey(port)) {
             serial = (SerialApi) serialPorts.get(port);
         } else {
             Log.d("SerialPort", port);
-            serial = new SerialApi(port, isAscii, baudRate, flags);
+            serial = new SerialApi(port, isAscii, baudRate, dataBits, parity, stopBits, flags, useCRC8);
             serialPorts.put(port, serial);
         }
         serial.setLogInterceptor(logInterceptor);

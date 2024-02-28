@@ -47,11 +47,19 @@ class MethodChannelSerialCommunication extends SerialCommunicationPlatform {
   Future<String?> openPort(
       {required DataFormat dataFormat,
       required String serialPort,
-      required int baudRate}) async {
+      required int baudRate,
+      required int dataBits,
+      required int parity,
+      required int stopBits,
+      bool useCRC8 = false}) async {
     final argument = {
       "dataFormat": dataFormat == DataFormat.ASCII ? "true" : "false",
       "serialPort": serialPort,
       "baudRate": baudRate.toString(),
+      "dataBits": dataBits.toString(),
+      "parity": parity.toString(),
+      "stopBits": stopBits.toString(),
+      "useCRC8": useCRC8 == true ? "true" : "false"
     };
     final version = await methodChannel.invokeMethod<String>(
         'embeddedSerial/open', argument);

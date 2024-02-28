@@ -37,7 +37,11 @@ abstract class SerialCommunicationPlatform extends PlatformInterface {
   Future<String?> openPort(
       {required DataFormat dataFormat,
       required String serialPort,
-      required int baudRate}) {
+      required int baudRate,
+      required int dataBits,
+      required int parity,
+      required int stopBits,
+      bool useCRC8 = false}) {
     throw UnimplementedError('openSerial() has not been implemented.');
   }
 

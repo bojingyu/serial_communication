@@ -58,17 +58,23 @@ public class OpenCommunication {
         });
         baseReader = new BaseReader() {
             @Override
-            protected void onParse(final String port, final boolean isAscii, final String read) {
-                // crc校验
-                if (!BaseReader.checkCrc(read)) {
-                    System.err.println("crc校验失败 " + read);
-                    return;
+            protected void onParse(final String port, final boolean isAscii, final String read, boolean useCRC8) {
+                if(useCRC8){
+                    // crc校验
+                    if (!BaseReader.checkCrc(read)) {
+                        System.err.println("crc校验失败 " + read);
+                        return;
+                    }
+                    readChannel = read.substring(0, read.length() - 2);
+                }else{
+                    readChannel = read;
                 }
+
 
                 // Log.d("SerialPortRead", new StringBuffer()
                 // .append(port).append("/").append(isAscii ? "ascii" : "hex")
                 // .append(" read：").append(read).append("\n").toString());
-                readChannel = read.substring(0, read.length() - 2);
+
                 // += "\n" + (new StringBuffer()
                 // .append(port).append("/").append(isAscii ? "ascii" : "hex")
                 // .append(" read：").append(read).append("\n").toString());
@@ -85,7 +91,7 @@ public class OpenCommunication {
         return entryValues;
     }
 
-    public void open(String name, boolean isAscii, int baudRate) {
+    public void open(String name, boolean isAscii, int baudRate, int dataBits, int parity, int stopBits, boolean useCRC8) {
         initData();
         String checkPort = name;
         if (TextUtils.isEmpty(checkPort)) {
@@ -108,7 +114,8 @@ public class OpenCommunication {
 
         if (entryValues.contains(checkPort)) {
             currentPort = checkPort;
-            spManager.startSerialPort(checkPort, isAscii, baseReader, baudRate);
+            //String port, boolean isAscii, int baudRate, int dataBits, int parity, int stopBits, int flags, BaseReader reader
+            spManager.startSerialPort(checkPort, isAscii, baudRate, dataBits, parity, stopBits, 0, baseReader, useCRC8);
             changeCode(isAscii);
         }
 

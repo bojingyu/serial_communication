@@ -39,7 +39,7 @@ public class SerialPort {
     private FileInputStream mFileInputStream;
     private FileOutputStream mFileOutputStream;
 
-    public SerialPort(File device, int baudrate, int flags) throws SecurityException, IOException {
+    public SerialPort(File device, int baudrate, int dataBits, int parity, int stopBits, int flags) throws SecurityException, IOException {
         /* Check access permission */
         if (!device.canRead() || !device.canWrite()) {
             try {
@@ -58,7 +58,7 @@ public class SerialPort {
             }
         }
 
-        mFd = open(device.getAbsolutePath(), baudrate, flags);
+        mFd = open(device.getAbsolutePath(), baudrate, dataBits, parity, stopBits, flags);
         if (mFd == null) {
             Log.e(TAG, "native open returns null");
             throw new IOException();
@@ -77,7 +77,8 @@ public class SerialPort {
     }
 
     // JNI
-    private native static FileDescriptor open(String path, int baudrate, int flags);
+    // private native static FileDescriptor open(String path, int baudrate, int flags);
+    private native FileDescriptor open(String absolutePath, int baudrate, int dataBits, int parity, int stopBits, int flags);
 
     public native void close();
 

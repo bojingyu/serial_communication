@@ -69,7 +69,16 @@ public class SerialCommunicationPlugin implements FlutterPlugin, MethodCallHandl
         result.success(list);
         break;
       case "embeddedSerial/open":
-        communication.open(argments.get("serialPort"), Boolean.parseBoolean(argments.get("dataFormat")),Integer.parseInt(argments.get("baudRate")));
+      //int dataBits, int parity, int stopBits
+        communication.open(
+          argments.get("serialPort"),
+          Boolean.parseBoolean(argments.get("dataFormat")),
+          Integer.parseInt(argments.get("baudRate")),
+          Integer.parseInt(argments.get("dataBits")),
+          Integer.parseInt(argments.get("parity")),
+          Integer.parseInt(argments.get("stopBits")),
+          Boolean.parseBoolean(argments.get("useCRC8"))
+        );
         break;
       case "embeddedSerial/close":
         communication.close();

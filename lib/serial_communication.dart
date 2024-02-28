@@ -11,7 +11,7 @@ class SerialCommunication {
     return SerialCommunicationPlatform.instance.startSerial();
   }
 
-  /// [openPort] method to call the open api with the specified [dataFormat],[serialPort],[baudRate].
+  /// [openPort] method to call the open api with the specified [dataFormat],[serialPort],[baudRate],[dataBits],[parity],[stopBits].
   /// The [dataFormat] used will be [ASCII], unless otherwise
   /// specified.
   ///
@@ -19,11 +19,35 @@ class SerialCommunication {
   Future<String?> openPort(
       {DataFormat? dataFormat,
       required String serialPort,
-      required int baudRate}) {
+      required int baudRate,
+      required int dataBits,
+      required int parity,
+      required int stopBits}) {
     return SerialCommunicationPlatform.instance.openPort(
         dataFormat: dataFormat ?? DataFormat.ASCII,
         serialPort: serialPort,
-        baudRate: baudRate);
+        baudRate: baudRate,
+        dataBits: dataBits,
+        parity: parity,
+        stopBits: stopBits,
+        useCRC8: false);
+  }
+
+  Future<String?> openPortWithCRC8(
+      {DataFormat? dataFormat,
+      required String serialPort,
+      required int baudRate,
+      required int dataBits,
+      required int parity,
+      required int stopBits}) {
+    return SerialCommunicationPlatform.instance.openPort(
+        dataFormat: dataFormat ?? DataFormat.ASCII,
+        serialPort: serialPort,
+        baudRate: baudRate,
+        dataBits: dataBits,
+        parity: parity,
+        stopBits: stopBits,
+        useCRC8: true);
   }
 
   /// [getAvailablePorts] : Listing the available serial ports on the device,
